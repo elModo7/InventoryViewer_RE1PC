@@ -3,7 +3,7 @@
 #NoEnv
 SetBatchLines -1
 weapons := ["2", "3", "4", "5", "6", "7", "8", "9", "10"] ; Weapons have quantity to the left
-objetoscountables := ["11", "12", "13", "14", "15", "16", "17", "18", "47"] ; Items with quantity to the right
+countableItems := ["11", "12", "13", "14", "15", "16", "17", "18", "47"] ; Items with quantity to the right
 
 Gui -Caption +E0x02000000 +E0x00080000
 Gui Font, s30 Bold c0x00D200, Tahoma
@@ -173,7 +173,7 @@ readMem:
 	}
 	
 	countableSlots := [0,0,0,0,0,0,0,0]
-	for k, v in objetoscountables
+	for k, v in countableItems
 	{
 		if(iSlot1 = v)
 			countableSlots[1] := 1

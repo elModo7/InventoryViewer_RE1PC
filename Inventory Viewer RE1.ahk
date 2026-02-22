@@ -16,7 +16,7 @@ Menu, Tray, Add, About, showAbout
 Menu, Tray, Add, Exit, GuiClose
 
 weapons := ["2", "3", "4", "5", "6", "7", "8", "9", "10"]
-objetoscountables := ["11", "12", "13", "14", "15", "16", "17", "18", "47"]
+countableItems := ["11", "12", "13", "14", "15", "16", "17", "18", "47"]
 
 slotAddresses := [0x838814, 0x838816, 0x838818, 0x83881A, 0x83881C, 0x83881E, 0x838820, 0x838822]
 
@@ -75,7 +75,7 @@ readMem:
         
         ; Determine Visibility (Weapon vs Countable vs None)
         isWeapon := HasValue(weapons, currID)
-        isCountable := HasValue(objetoscountables, currID)
+        isCountable := HasValue(countableItems, currID)
         
         if (isWeapon) {
             GuiControl, Hide, icSlot%idx%
