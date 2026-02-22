@@ -4,6 +4,8 @@ A real-time visual inventory overlay for **Resident Evil 1 (Biohazard)** [Classi
 
 ---
 
+![Preview](https://github.com/elModo7/InventoryViewer_RE1PC/blob/main/img/github_preview.png?raw=true)
+
 ## Features
 
 * **8-Slot Dynamic Grid**: Automatically displays item icons for all eight inventory slots
