@@ -1,13 +1,13 @@
 ﻿;@Ahk2Exe-SetName Inventory Viewer for RE1
 ;@Ahk2Exe-SetDescription Real-time inventory overlay
-;@Ahk2Exe-SetVersion 1.0.0
+;@Ahk2Exe-SetVersion 1.1.0
 ;@Ahk2Exe-SetCopyright 2026 elModo7 - VictorDevLog
 ;@Ahk2Exe-SetOrigFilename Inventory Viewer RE1.exe
 #SingleInstance Force
 #NoEnv
 #Include <aboutScreen>
 SetBatchLines -1
-version := "1.0"
+version := "1.1"
 
 ; Tray Menu
 Menu, Tray, NoStandard
@@ -47,7 +47,7 @@ Loop 8 {
 Gui Add, Picture, x-1 y-8 w406 h551 gmoveWindow, img\inventory.png
 Gui Show, w405 h540, RE1 Inventory GUI
 
-global base := getBase("ahk_exe Biohazard.exe")
+gosub, regainBaseAddress
 SetTimer, readMem, 250
 SetTimer, regainBaseAddress, 5000
 Return
@@ -109,14 +109,11 @@ Return
 
 regainBaseAddress:
     base := getBase("ahk_exe Biohazard.exe")
+    WinGet, pid, PID, ahk_exe Biohazard.exe
 return
 
 RM(MADDRESS) {
-    global base
-    static pid
-    if !pid
-        WinGet, pid, PID, ahk_exe Biohazard.exe
-    
+    global base, pid
     ProcessHandle := DllCall("OpenProcess", "Int", 24, "Char", 0, "UInt", pid, "UInt")
     VarSetCapacity(MVALUE, 4, 0)
     DllCall("ReadProcessMemory", "UInt", ProcessHandle, "Ptr", base+MADDRESS, "Ptr", &MVALUE, "Uint", 1, "Ptr", 0)
