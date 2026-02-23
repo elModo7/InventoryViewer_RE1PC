@@ -1,8 +1,9 @@
 # RE1 Inventory Tracker
 
-A real-time visual inventory overlay for **Resident Evil 1 (Biohazard)** [Classic Rebirth](https://classicrebirth.com/index.php/downloads/resident-evil-classic-rebirth/).
+A real-time visual inventory overlay for **Resident Evil 1 (Biohazard)** [Classic Rebirth](https://classicrebirth.com/index.php/downloads/resident-evil-classic-rebirth/). 📹 [Install video and showcase (Spanish)](https://youtu.be/DiURkLnZREQ)
 
 This tool synchronizes with the game's memory to provide an external, real-time view of your current items and resources.
+
 
 ---
 
