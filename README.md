@@ -18,6 +18,8 @@ This tool synchronizes with the game's memory to provide an external, real-time 
   * **Consumables**: Displays counts (ammo/ribbons) on the right side.
 * **Memory-Driven Updates**: Polls the `Biohazard.exe` process to reflect inventory changes in real-time.
 * Draggable window for custom placement.
+* Added **IGT** for tracking **real in-game time**.
+* Added **Health** overlay.
 
 ## Compiling from source
 
