@@ -1,13 +1,13 @@
 ﻿;@Ahk2Exe-SetName Inventory Viewer for RE1
 ;@Ahk2Exe-SetDescription Real-time inventory overlay
-;@Ahk2Exe-SetVersion 1.1.0
+;@Ahk2Exe-SetVersion 1.2.0
 ;@Ahk2Exe-SetCopyright 2026 elModo7 - VictorDevLog
 ;@Ahk2Exe-SetOrigFilename Inventory Viewer RE1.exe
 #SingleInstance Force
 #NoEnv
 #Include <aboutScreen>
 SetBatchLines -1
-version := "1.1"
+version := "1.2"
 
 ; Tray Menu
 Menu, Tray, NoStandard
@@ -44,16 +44,17 @@ Loop 8 {
     Gui Add, Picture, viiSlot%A_Index% x%xImg% y%yImg% w158 h118, img\0.png
 }
 
-Gui Add, Picture, x-1 y-8 w406 h551 gmoveWindow, img\inventory.png
+Gui Add, Picture, x-1 y-8 w406 h551 gmoveWindow vbgImg, img\inventory_chris.png
 Gui Show, w405 h540, RE1 Inventory GUI
 
 gosub, regainBaseAddress
 SetTimer, readMem, 250
+SetTimer, playerCheck, 3000
 SetTimer, regainBaseAddress, 5000
 Return
 
 readMem:
-    Loop 8 {
+    Loop % isJill ? 8 : 6 {
         idx := A_Index
         addr := slotAddresses[idx]
         
@@ -94,6 +95,29 @@ readMem:
             GuiControl, Hide, cclSlot%idx%
         }
     }
+return
+
+playerCheck:
+    ; Update inventory size
+    playerValue := RM(0x8386F9)
+    isJill := (playerValue == 1 || playerValue == 5) ? true : false
+    if (wasJill != isJill) {
+        if (isJill) {
+            GuiControl,, bgImg, % "img\inventory.png" ; Jill
+            GuiControl, Move, bgImg, x-1 y-8 w406 h551
+            WinMove, RE1 Inventory GUI,,,,, 540
+            GuiControl, Show, iiSlot7
+            GuiControl, Show, iiSlot8
+        } else {
+            GuiControl,, bgImg, % "img\inventory_chris.png" ; Chris / Other
+            GuiControl, Move, bgImg, x-1 y-8 w406 h451
+            GuiControl, Hide, iiSlot7
+            GuiControl, Hide, iiSlot8
+            WinMove, RE1 Inventory GUI,,,,, 440
+        }
+    }
+    
+    wasJill := isJill
 return
 
 HasValue(arr, val) {
