@@ -20,6 +20,7 @@ This tool synchronizes with the game's memory to provide an external, real-time 
 * Draggable window for custom placement.
 * Added **IGT** for tracking **real in-game time**.
 * Added **Health** overlay.
+* Standard and **HD Texture Pack** modes.
 
 ## Compiling from source
 

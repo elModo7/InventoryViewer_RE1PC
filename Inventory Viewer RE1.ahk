@@ -1,17 +1,19 @@
 ﻿;@Ahk2Exe-SetName Inventory Viewer for RE1
 ;@Ahk2Exe-SetDescription Real-time inventory overlay
-;@Ahk2Exe-SetVersion 1.3.0
+;@Ahk2Exe-SetVersion 1.4.0
 ;@Ahk2Exe-SetCopyright 2026 elModo7 - VictorDevLog
 ;@Ahk2Exe-SetOrigFilename Inventory Viewer RE1.exe
 #SingleInstance Force
 #NoEnv
 #Include <aboutScreen>
 SetBatchLines -1
-version := "1.3"
+version := "1.4"
 
 ; Tray Menu
 Menu, Tray, NoStandard
 Menu, Tray, Tip, Inventory Viewer for RE1 %version% 
+Menu, Tray, Add, HD Textures, toggleTextures
+Menu, Tray, Add,
 Menu, Tray, Add, About, showAbout
 Menu, Tray, Add, Exit, GuiClose
 
@@ -23,9 +25,10 @@ slotAddresses := [0x838814, 0x838816, 0x838818, 0x83881A, 0x83881C, 0x83881E, 0x
 oldIDs := []
 oldQtys := []
 
-global ChangeType := "" ; damage/heal
-global CurrentState := ""
+global changeType := "" ; damage/heal
+global currentState := ""
 global OldHealthValue := ""
+global hdTextures := 0
 
 ; INVENTORY GUI
 Gui -Caption +E0x02000000 +E0x00080000
@@ -49,13 +52,13 @@ Loop 8 {
     Gui Add, Picture, viiSlot%A_Index% x%xImg% y%yImg% w158 h118, img\0.png
 }
 
-Gui Add, Picture, x-1 y-8 w406 h551 gmoveWindow vbgImg, img\inventory_chris.png
-Gui Show, x30 y182 w405 h540, RE1 Inventory GUI
+Gui Add, Picture, x0 y0 w406 h551 gmoveWindow vbgImg, img\inventory.png
+Gui Show, x30 y182 w405 h550, RE1 Inventory GUI
 
 ; HEALTH GUI
 Gui, Health: -Caption +LastFound +E0x02000000 +E0x00080000
 Gui, Health:Font, s20 cAAAAAA
-Gui, Health:Add, Text, +BackgroundTrans gmoveWindow x25 y15 w300 vtxtHealth,
+Gui, Health:Add, Text, +BackgroundTrans gmoveWindow x45 y15 w300 vtxtHealth,
 Gui Health:Add, Picture, +BackgroundTrans vtxtOverlay gmoveWindow x0 y0 w198 h92, ; img\damage.PNG
 Gui Health:Add, Picture, vtxtImg gmoveWindow x0 y0 w198 h92, img\fine.PNG
 Gui, Health:show, x30 y30 w198 h92, HEALTH
@@ -86,7 +89,7 @@ readMem:
 
         ; Update Image if ID changed
         if (currID != oldIDs[idx]) {
-            GuiControl,, iiSlot%idx%, % "img\" currID ".png"
+            GuiControl,, iiSlot%idx%, % hdTextures ? "img\hd\" currID ".png" : "img\" currID ".png"
             oldIDs[idx] := currID
         }
         
@@ -136,29 +139,29 @@ readMem:
     GuiControl, IGT:Text, txtTime, IGT -> %hours%:%minutes%:%seconds%
     
     ; HEALTH
-    if (Current <= 24 && CurrentState != "danger")
+    if (Current <= 24 && currentState != "danger")
     {
+        currentState := "danger"
         GuiControl, Health: +cRed, txtHealth
-        GuiControl, Health: Text, txtImg, img\danger.PNG
-        CurrentState := "danger"
+        GuiControl, Health: Text, txtImg, % hdTextures ? "img\hd\" currentState ".PNG" : "img\" currentState ".PNG"
     }
-    else if (Current > 25 && Current <= 48 && CurrentState != "caution2")
+    else if (Current > 25 && Current <= 48 && currentState != "caution2")
     {
+        currentState := "caution2"
         GuiControl, Health: +cFF681F, txtHealth
-        GuiControl, Health: Text, txtImg, img\caution2.PNG
-        CurrentState := "caution2"
+        GuiControl, Health: Text, txtImg, % hdTextures ? "img\hd\" currentState ".PNG" : "img\" currentState ".PNG"
     }
-    else if (Current > 49 && Current <= 72 && CurrentState != "caution1")
+    else if (Current > 49 && Current <= 72 && currentState != "caution1")
     {
+        currentState := "caution1"
         GuiControl, Health: +cYellow, txtHealth
-        GuiControl, Health: Text, txtImg, img\caution1.PNG
-        CurrentState := "caution1"
+        GuiControl, Health: Text, txtImg, % hdTextures ? "img\hd\" currentState ".PNG" : "img\" currentState ".PNG"
     }
-    else if (Current > 73 && Current <= 140 && CurrentState != "fine")
+    else if (Current > 73 && Current <= 140 && currentState != "fine")
     {
+        currentState := "fine"
         GuiControl, Health: +cGreen, txtHealth
-        GuiControl, Health: Text, txtImg, img\fine.PNG
-        CurrentState := "fine"
+        GuiControl, Health: Text, txtImg, % hdTextures ? "img\hd\" currentState ".PNG" : "img\" currentState ".PNG"
     }
 
     ; Convert raw HP to %
@@ -174,12 +177,12 @@ readMem:
             ; State change overlay
             if (hpPercent < OldHpPercent)
             {
-                ChangeType := "damage"
+                changeType := "damage"
                 Gosub, SetOverlay
             }
             else if (hpPercent > OldHpPercent)
             {
-                ChangeType := "heal"
+                changeType := "heal"
                 Gosub, SetOverlay
             }
 
@@ -187,12 +190,12 @@ readMem:
         }
         else
         {
-            ChangeType := "damage"
+            changeType := "damage"
             Gosub, SetOverlay
+            currentState := "danger"
             GuiControl, Health: +cRed, txtHealth
             GuiControl, Health: Text, txtHealth, You Died
-            GuiControl, Health: Text, txtImg, img\danger.PNG
-            CurrentState := "danger"
+            GuiControl, Health: Text, txtImg, % hdTextures ? "img\hd\" currentState ".PNG" : "img\" currentState ".PNG"
         }
     }
 
@@ -205,28 +208,68 @@ playerCheck:
     isJill := (playerValue == 1 || playerValue == 5) ? true : false
     if (wasJill != isJill) {
         if (isJill) {
-            GuiControl,, bgImg, % "img\inventory.png" ; Jill
-            GuiControl, Move, bgImg, x-1 y-8 w406 h551
-            WinMove, RE1 Inventory GUI,,,,, 540
+            GuiControl,, bgImg, % hdTextures ? "img\hd\inventory.png" : "img\inventory.png" ; Jill
+            if (hdTextures)
+                GuiControl, Move, bgImg, x0 y0 w416 h551
+            else
+                GuiControl, Move, bgImg, x0 y0 w406 h551
+            WinMove, RE1 Inventory GUI,,,,, 550
             GuiControl, Show, iiSlot7
             GuiControl, Show, iiSlot8
         } else {
-            GuiControl,, bgImg, % "img\inventory_chris.png" ; Chris / Other
-            GuiControl, Move, bgImg, x-1 y-8 w406 h451
+            GuiControl,, bgImg, % hdTextures ? "img\hd\inventory_chris.png" : "img\inventory_chris.png" ; Chris / Other
+            if (hdTextures)
+                GuiControl, Move, bgImg, x0 y0 w416 h451
+            else
+                GuiControl, Move, bgImg, x0 y0 w406 h451
             GuiControl, Hide, iiSlot7
             GuiControl, Hide, iiSlot8
-            WinMove, RE1 Inventory GUI,,,,, 440
+            WinMove, RE1 Inventory GUI,,,,, 450
         }
     }
     
     wasJill := isJill
 return
 
+toggleTextures:
+    hdTextures := !hdTextures
+    if (hdTextures) {
+        Menu, Tray, Rename, HD Textures, Normal Textures
+    } else {
+        Menu, Tray, Rename, Normal Textures, HD Textures
+    }
+    
+    Loop % isJill ? 8 : 6 {
+        idx := A_Index
+        addr := slotAddresses[idx]
+
+        currID  := RM(addr)
+        GuiControl,, iiSlot%idx%, % hdTextures ? "img\hd\" currID ".png" : "img\" currID ".png"
+        oldIDs[idx] := currID
+    }
+    
+    if (isJill) {
+        GuiControl,, bgImg, % hdTextures ? "img\hd\inventory.png" : "img\inventory.png"
+        if (hdTextures)
+            GuiControl, Move, bgImg, x0 y0 w416 h551
+        else 
+            GuiControl, Move, bgImg, x0 y0 w406 h551
+    } else {
+        GuiControl,, bgImg, % hdTextures ? "img\hd\inventory_chris.png" : "img\inventory_chris.png"
+        if (hdTextures)
+            GuiControl, Move, bgImg, x0 y0 w416 h451
+        else
+            GuiControl, Move, bgImg, x0 y0 w406 h451
+    }
+    
+    GuiControl, Health: Text, txtImg, % hdTextures ? "img\hd\" currentState ".PNG" : "img\" currentState ".PNG"
+return
+
 SetOverlay:
-    if (ChangeType = "damage")
-        GuiControl, Health: Text, txtOverlay, img\damage.PNG
-    else if (ChangeType = "heal")
-        GuiControl, Health: Text, txtOverlay, img\heal.PNG
+    if (changeType = "damage")
+        GuiControl, Health: Text, txtOverlay, % hdTextures ? "img\hd\damage.PNG" : "img\damage.PNG"
+    else if (changeType = "heal")
+        GuiControl, Health: Text, txtOverlay, % hdTextures ? "img\hd\heal.PNG" : "img\heal.PNG"
     SetTimer, ClearOverlay, 1000
 return
 
@@ -279,7 +322,7 @@ return
 
 showAbout() {
 	global version
-	showAboutScreen("Inventory Viewer for RE1 v" version, "Real-time inventory overlay for the Classic Rebirth path of Resident Evil 1 PC.")
+	showAboutScreen("Inventory Viewer for RE1 v" version, "Real-time inventory overlay for the Classic Rebirth path of Resident Evil 1 PC.`nHD texture pack by LeigiBoy, special thanks to SenhorX.")
 }
 
 HealthGuiClose:
