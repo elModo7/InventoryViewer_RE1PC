@@ -322,7 +322,7 @@ return
 
 showAbout() {
 	global version
-	showAboutScreen("Inventory Viewer for RE1 v" version, "Real-time inventory overlay for the Classic Rebirth path of Resident Evil 1 PC.`nHD texture pack by LeigiBoy, special thanks to SenhorX.")
+	showAboutScreen("Inventory Viewer for RE1 v" version, "Real-time inventory overlay for the Classic Rebirth path of Resident Evil 1 PC.`nHD textures: SHDP Team, LeigiBoy. Testing: SenhorX.")
 }
 
 HealthGuiClose:
