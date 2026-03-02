@@ -8,7 +8,7 @@ This tool synchronizes with the game's memory to provide an external, real-time 
 
 ---
 
-![Preview](https://github.com/elModo7/InventoryViewer_RE1PC/blob/main/img/github_preview.png?raw=true)
+![inventory](https://github.com/user-attachments/assets/e258eebd-c816-45a8-bf3a-88fcdec27d07)
 
 ## Features
 
