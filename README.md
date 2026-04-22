@@ -4,6 +4,7 @@ A real-time visual inventory overlay for **Resident Evil 1 (Biohazard)** [Classi
 
 This tool synchronizes with the game's memory to provide an external, real-time view of your current items and resources.
 
+📹 [Install video and showcase (English)](https://youtu.be/N_DhRtPLl0w?si=yU2KO41lDTNLRiim)
 📹 [Install video and showcase (Spanish)](https://youtu.be/DiURkLnZREQ)
 
 ---
